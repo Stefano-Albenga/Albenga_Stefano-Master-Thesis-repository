@@ -1,0 +1,221 @@
+[Title]
+electron distribution
+
+# user defined variables
+set: c1[10e-4]   $ Cell radius (cm)
+set: c2[5e-4]    $ Nucleus radius (cm)
+set: c3[10e-4]   $ mezzo lato cubo esterno cellula (cm)
+set: c4[50e-4]   $ mezzo lato cubo mondo (cm)
+
+[Parameters]
+ icntl    = 0             # 5 per statistiche generali, 7-8 per geometria 2d 
+                          # o 3d, 11 per risultati tally + dettagliati
+ maxcas   = 1000000         # (D=10) number of particles per one batch
+ maxbch   = 5             # (D=10) number of batches
+ nlost    = 10            # aumentato rispetto a 10 senò non mi genera nulla
+ icommat  = 1             # posso usare questo genere di commenti ovunque
+# istdev  = -1            # ottengo risultati migliori rifacendo i calcoli 
+                          # con risultato primo tentativo
+e-mode   = 2             # Abilita la generazione di particelle secondarie per
+#                          # n < 20 MeV,fondomentale per migliorare le simulaz,
+#                          # ma rallenta enormemente i calcoli
+ nedisp   = 1             # attiva la distribuzione di energia all'interno 
+                          # della mesh
+ nspred   = 2             # metodo di scattering avanzato
+ ascat1   = 13.6          # cost di Moliere nella formula di Highland
+ ascat2   = 3.8e-2        # coef empirico stessa forma di scattering multiplo, 
+                          # fattore correttivo
+negs     = 1             # permette di tenere conto delle part secondarie neg 
+                          # tipo elettroni
+ epstfl   = 1             # controllo per la conservazione dell'energia
+ ireschk  = 1             # controllo di materiali/tabelle per la coerenza 
+                          # interna
+
+
+[ S o u r c e ]
+  s-type = 2             
+  proj   = electron       # tipo particella (in alternativa: proj = 3)
+  x0 = -c3 ; x1 =  c3
+  y0 = -c3 ; y1 =  c3
+  z0 = -c3 ; z1 =  c3
+  dir = all               # isotropa
+
+  # energy spectra (bin [Emin,Emax] already weighted w(i))  normalized
+  e-type = 22
+  ne = 43
+  0.00e+00  2.50e-02  9.00e+11
+  2.50e-02  5.00e-02  8.29e+11
+  5.00e-02  7.50e-02  6.73e+11
+  7.50e-02  1.00e-01  6.06e+11
+  1.00e-01  1.50e-01  1.04e+12
+  1.50e-01  2.00e-01  8.93e+11
+  2.00e-01  2.50e-01  8.31e+11
+  2.50e-01  3.00e-01  7.76e+11
+  3.00e-01  4.00e-01  1.39e+12
+  4.00e-01  4.50e-01  6.15e+11
+  4.50e-01  5.00e-01  5.68e+11
+  5.00e-01  5.50e-01  5.40e+11
+  5.50e-01  6.00e-01  5.39e+11
+  6.00e-01  7.00e-01  1.03e+12
+  7.00e-01  8.00e-01  9.55e+11
+  8.00e-01  9.00e-01  9.48e+11
+  9.00e-01  1.00e+00  9.27e+11
+  1.00e+00  1.10e+00  8.57e+11
+  1.10e+00  1.20e+00  8.74e+11
+  1.20e+00  1.30e+00  8.98e+11
+  1.30e+00  1.40e+00  9.80e+11
+  1.40e+00  1.50e+00  1.05e+12
+  1.50e+00  1.60e+00  1.16e+12
+  1.60e+00  1.80e+00  2.64e+12
+  1.80e+00  2.00e+00  2.13e+12
+  2.00e+00  2.10e+00  2.77e+11
+  2.10e+00  2.30e+00  3.32e+11
+  2.30e+00  2.50e+00  3.44e+11
+  2.50e+00  3.00e+00  8.12e+11
+  3.00e+00  3.20e+00  3.78e+11
+  3.20e+00  3.40e+00  4.03e+11
+  3.40e+00  3.60e+00  3.08e+11
+  3.60e+00  3.80e+00  2.61e+11
+  3.80e+00  4.00e+00  2.39e+11
+  4.00e+00  4.20e+00  2.61e+11
+  4.20e+00  4.40e+00  3.30e+11
+  4.40e+00  4.60e+00  3.66e+11
+  4.60e+00  4.80e+00  1.25e+11
+  4.80e+00  5.00e+00  1.33e+10
+  5.00e+00  5.50e+00  4.70e+10
+  5.50e+00  6.00e+00  5.49e+10
+  6.00e+00  7.00e+00  4.14e+10
+  7.00e+00  1.15e+01  3.31e+10
+
+
+[Material]
+Mat[1] $ Water
+  H         2.0
+  O         1.0
+Mat[2001] $ Cell composition
+  H 0.111 
+  C 0.126 
+  N 0.021 
+  O 0.742  
+
+[Surface]
+1   so     c1     $ cellula
+2   so     c2     $ nucleo
+3   rpp           $ esterno cellula (10 µm di lato)
+          -c3 c3  $ asse x
+          -c3 c3  $ asse y
+          -c3 c3  $ asse z
+4   rpp           $ esterno cellula (100 µm di lato)
+          -c4 c4  $ asse x
+          -c4 c4  $ asse y
+          -c4 c4  $ asse z
+
+[ C e l l ]
+C inizio universo cellula
+1  2001  -1.0   -1 2  u=2  $ int. cell. intersecato con l'est. nucleo
+2  2001  -1.0   -2    u=2  $ int. nucleo
+3     1  -1.0    1    u=2  $ esterno universo cellula.
+C fine universo cellula
+C
+C inizio universo tessuto lattice
+4     0         -3    u=1 fill=2 lat=1 $ lattice con cellule
+C fine universo tessuto lattice
+C
+C inizio mondo
+5     0         -4   fill=1 $ contenuto del lattice nel mondo
+C fine mondo
+C
+C mondo esterno
+999  -1          4      $ tutto l'esterno del cubo d'acqus
+
+
+
+[t-sed] off          #just a few of all simulations made, changing cdiam parameter
+mesh    = reg     
+reg     = ( 2 < 4[0 0 0] < 5 )       
+part    = electron     
+se-unit = 3       
+se-type = 3
+emin    = 1.0e-3
+emax    = 10000  
+ne      = 100
+unit    = 7
+axis    = sed
+file    = electron26      
+gshow   = 3  
+cdiam = 0.26   
+epsout  = 1
+
+[t-sed] off          
+mesh    = reg     
+reg     = ( 2 < 4[0 0 0] < 5 )       
+part    = electron     
+se-unit = 3       
+se-type = 3
+emin    = 1.0e-3
+emax    = 10000  
+ne      = 100
+unit    = 7
+axis    = sed
+file    = electron27      
+gshow   = 3  
+cdiam = 0.27   
+epsout  = 1
+
+[t-sed] off        
+mesh    = reg     
+reg     = ( 2 < 4[0 0 0] < 5 )       
+part    = electron     
+se-unit = 3       
+se-type = 3
+emin    = 1.0e-3
+emax    = 10000  
+ne      = 100
+unit    = 7
+axis    = sed
+file    = electron28      
+gshow   = 3  
+cdiam = 0.28   
+epsout  = 1
+
+[t-sed] off          
+mesh    = reg     
+reg     = ( 2 < 4[0 0 0] < 5 )       
+part    = electron     
+se-unit = 3       
+se-type = 3
+emin    = 1.0e-3
+emax    = 10000  
+ne      = 100
+unit    = 7
+axis    = sed
+file    = electron29      
+gshow   = 3  
+cdiam = 0.29   
+epsout  = 1
+[t-deposit] off
+mesh   = reg         
+reg    = 2           
+part   = all         
+output = dose        
+unit   = 0           
+axis   = reg          
+file   = dose_distr_e.out
+gshow  = 3           
+epsout = 1
+
+[t-deposit] 
+mesh   = reg         
+reg    = (2 < 4[0 0 0] < 5 )          
+part   = all         
+output = deposit        $ zn per event
+deposit = 0
+e-type = 3             $ energy binning 
+emin = 1e-6
+emax = 10
+ne = 100
+unit   = 3           $ Gy per history
+axis   = eng         
+file   = deposit_electron.out
+gshow  = 3           
+epsout = 1

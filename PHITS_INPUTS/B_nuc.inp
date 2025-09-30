@@ -1,0 +1,275 @@
+ [Title]
+nucleo_BNCT
+
+# user defined variables
+set: c1[10e-4]   $ Cell radius (cm)
+set: c2[5e-4]    $ Nucleus radius (cm)
+set: c3[10e-4]   $ mezzo lato cubo esterno cellula (cm)
+set: c4[50e-4]   $ mezzo lato cubo mondo (cm)
+
+[Parameters]
+ icntl    = 0             # 5 per statistiche generali, 7-8 per geometria 2d 
+                          # o 3d, 11 per risultati tally + dettagliati
+ maxcas   = 1000000         # (D=10) number of particles per one batch
+ maxbch   = 5             # (D=10) number of batches
+ nlost    = 100            # aumentato rispetto a 10 senò non mi genera nulla
+ icommat  = 1             # posso usare questo genere di commenti ovunque
+# istdev  = -1            # ottengo risultati migliori rifacendo i calcoli 
+                          # con risultato primo tentativo
+ e-mode   = 2             # Abilita la generazione di particelle secondarie per
+#                          # n < 20 MeV,fondomentale per migliorare le simulaz,
+#                          # ma rallenta enormemente i calcoli
+ nedisp   = 1             # attiva la distribuzione di energia all'interno 
+                          # della mesh
+ nspred   = 2             # metodo di scattering avanzato
+ ascat1   = 13.6          # cost di Moliere nella formula di Highland
+ ascat2   = 3.8e-2        # coef empirico stessa forma di scattering multiplo, 
+                          # fattore correttivo
+negs     = 1             # permette di tenere conto delle part secondarie neg 
+                          # tipo elettroni
+#etsmax = 1.3              # limita simulazione nella tally track
+#etsmin = 0.4              # limita simulazione nella tally track
+ epstfl   = 1             # controllo per la conservazione dell'energia
+ ireschk  = 1             # controllo di materiali/tabelle per la coerenza 
+                          # interna
+
+
+[ S o u r c e ]
+  totfact = 1
+  <source> = 93.7
+   s-type =   2         # mono-energetic axial source
+   proj =  alpha        # kind of incident nucleus         
+   e0 =  0.3675           # energy of beam [MeV/u]
+   x0 =   -c2           # min x-axis [cm]
+   x1 =    c2           # max x-axis [cm]
+   y0 =   -c2           # min y-axis [cm]
+   y1 =    c2           # max y-axis [cm]
+   z0 =   -c2           # min z-axis [cm]
+   z1 =    c2           # max z-axis [cm]
+   dir =   all          # z-direction of beam [cosine]
+ <source> = 93.7
+ s-type =   2         # mono-energetic axial source
+   proj =  3000007      # kind of incident nucleus
+   e0 =  0.12           # energy of beam [MeV/u]
+   x0 =   -c2           # min x-axis [cm]
+   x1 =    c2           # max x-axis [cm]
+   y0 =   -c2           # min y-axis [cm]
+   y1 =    c2           # max y-axis [cm]
+   z0 =   -c2           # min z-axis [cm]
+   z1 =    c2           # max z-axis [cm]
+   dir =   all          # z-direction of beam [cosine] 
+ <source> = 93.7
+ s-type =   2         # mono-energetic axial source
+   proj = photon
+   e0 = 0.478
+   x0 =   -c2           # min x-axis [cm]
+   x1 =    c2           # max x-axis [cm]
+   y0 =   -c2           # min y-axis [cm]
+   y1 =    c2           # max y-axis [cm]
+   z0 =   -c2           # min z-axis [cm]
+   z1 =    c2           # max z-axis [cm]
+   dir =   all          # z-direction of beam [cosine]
+   <source> = 6.3
+   s-type =   2         # mono-energetic axial source
+   proj =  alpha        # kind of incident nucleus          
+   e0 =  0.4425           # energy of beam [MeV/u]
+   x0 =   -c2           # min x-axis [cm]
+   x1 =    c2           # max x-axis [cm]
+   y0 =   -c2           # min y-axis [cm]
+   y1 =    c2           # max y-axis [cm]
+   z0 =   -c2           # min z-axis [cm]
+   z1 =    c2           # max z-axis [cm]
+   dir =   all          # z-direction of beam [cosine]
+ <source> = 6.3
+ s-type =   2         # mono-energetic axial source
+   proj =  3000007      # kind of incident nucleus     
+   e0 =  0.1443           # energy of beam [MeV/u]
+   x0 =   -c2           # min x-axis [cm]
+   x1 =    c2           # max x-axis [cm]
+   y0 =   -c2           # min y-axis [cm]
+   y1 =    c2           # max y-axis [cm]
+   z0 =   -c2           # min z-axis [cm]
+   z1 =    c2           # max z-axis [cm]
+   dir =   all          # z-direction of beam [cosine]
+
+            
+[Material]
+Mat[1] $ Water
+  H         2.0
+  O         1.0
+Mat[2001] $ Cell composition
+  H 0.111 
+  C 0.126 
+  N 0.021 
+  O 0.742  
+
+[Surface]
+1   so     c1     $ cellula
+2   so     c2     $ nucleo
+3   rpp           $ esterno cellula (10 µm di lato)
+          -c3 c3  $ asse x
+          -c3 c3  $ asse y
+          -c3 c3  $ asse z
+4   rpp           $ esterno cellula (100 µm di lato)
+          -c4 c4  $ asse x
+          -c4 c4  $ asse y
+          -c4 c4  $ asse z
+
+[ C e l l ]
+C inizio universo cellula
+1  2001  -1.0   -1 2  u=2  $ int. cell. intersecato con l'est. nucleo
+2  2001  -1.0   -2    u=2  $ int. nucleo
+3     1  -1.0    1    u=2  $ esterno universo cellula.
+C fine universo cellula
+C
+C inizio universo tessuto lattice
+4     0         -3    u=1 fill=2 lat=1 $ lattice con cellule
+C fine universo tessuto lattice
+C
+C inizio mondo
+5     0         -4   fill=1 $ contenuto del lattice nel mondo
+C fine mondo
+C
+C mondo esterno
+999  -1          4      $ tutto l'esterno del cubo d'acqus
+
+[t-track] off
+mesh   = xyz 
+x-type = 2
+nx     = 100
+xmin   = -c2
+xmax   =  c2
+y-type = 2
+ny     = 100
+ymin   = -c2
+ymax   =  c2
+z-type = 2
+nz     = 5
+zmin   = -c2
+zmax   =  c2
+e-type = 2
+ne     = 1
+emin   = 10e-3
+emax   = 1000
+part   = photon alpha 3007007 all
+axis   = xy
+file   = track_xyz_reg.out
+unit   = 1
+gshow  = 1
+epsout = 1
+
+[t-track] off
+mesh   = reg
+reg    = ( 2 < 4[0 0 0] < 5 )
+e-type = 3
+ne     = 1200
+emin   = 1e-3
+emax   = 10
+part   = photon alpha 3000007 all
+axis   = eng
+file   = track_reg.out
+unit   = 1
+gshow  = 3
+epsout = 1
+
+
+[t-sed] off    # "a priori methodology" usefull 
+mesh    = reg     
+reg     = ( 2 < 4[0 0 0] < 5 )       
+part    = alpha 3000007 photon all 
+se-unit = 2       # lineal energy
+se-type = 3
+emin    = 10e-3
+emax    = 1000 
+ne      = 100
+unit    = 8
+axis    = sed
+file    = e_lineale      
+gshow   = 3   
+cdiam = 0.3   
+epsout  = 1
+
+[t-product] off
+mesh   = xyz
+x-type = 2
+nx     = 100
+xmin   = -c4
+xmax   =  c4
+y-type = 2
+ny     = 100
+ymin   = -c4
+ymax   =  c4
+z-type = 2
+nz     = 1
+zmin   = -1e-4
+zmax   =  1e-4
+e-type = 3
+ne     = 1
+emin   = 1e-3
+emax   = 10
+part   = photon alpha 3000007 all
+axis   = xy
+file   = source.out
+unit   = 1
+gshow  = 3
+epsout = 1
+output = source
+
+[t-deposit] off
+mesh   = reg         $ mesh 
+reg    =( 2 < 4[0 0 0] < 5 )           $ ID  “nucleus”
+part   = all         $ all particles
+output = dose        $  dose in Gy per source
+unit   = 0           $ Gy per history
+axis   = reg         $ axis “reg” per mesh=reg 
+file   = dose_nucleo.out
+gshow  = 3           $  EPS
+epsout = 1
+
+[t-sed] 
+mesh    = reg     
+reg     = ( 2 < 4[0 0 0] < 5 )       
+part    = all 
+se-unit = 3      
+se-type = 3
+emin    = 10e-3
+emax    = 10000 
+ne      = 100
+unit    = 7
+axis    = sed
+file    = zn_BN      
+gshow   = 3   
+cdiam = 0.3   
+epsout  = 1
+
+[t-sed] 
+mesh    = reg     
+reg     = ( 2 < 4[0 0 0] < 5 )       
+part    = all 
+se-unit = 3      
+se-type = 3
+emin    = 10e-3
+emax    = 10000 
+ne      = 100
+unit    = 7
+axis    = sed
+file    = zd_BN      
+gshow   = 3   
+cdiam = 0.1   
+epsout  = 1
+
+[t-deposit] off
+mesh   = reg         
+reg    = (2 < 4[0 0 0] < 5 )          
+part   = all         
+output = deposit        $ zn per event
+deposit = 0
+e-type = 3             $ binning energiy chosen
+emin = 1e-6
+emax = 10
+ne = 100
+unit   = 3           $ Gy per history
+axis   = eng         
+file   = deposit_nuc.out
+gshow  = 3           
+epsout = 1
